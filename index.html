@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
+  <meta name="theme-color" content="#05080f">
+  <meta name="description" content="Jarvis NexStage — assistente pessoal de IA de última geração.">
+  <title>Jarvis NexStage</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <link rel="stylesheet" href="/styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/marked@14.1.3/marked.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/highlight.js@11.10.0/lib/highlight.min.js" onload="window.hljsReady=1"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11.3.0/dist/mermaid.min.js"></script>
+  <script defer src="/app.js"></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" id="side">
+    <div class="brand"><div class="mark"><span>J</span></div><div><b>JARVIS</b><small>NEXSTAGE · 2.0</small></div></div>
+    <button class="btn-new" id="newChat">＋ Nova conversa <kbd>Ctrl K</kbd></button>
+    <div class="label">MODOS</div>
+    <nav class="modes" id="modes"></nav>
+    <div class="label">CONVERSAS <input id="searchChats" placeholder="Buscar…"></div>
+    <div class="chats" id="chats"></div>
+    <div class="side-foot">
+      <button id="openMemory">🧠 Memória</button>
+      <button id="openSettings">⚙ Configurações</button>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main class="main">
+    <header class="top">
+      <button class="icon" id="menuBtn" aria-label="Menu">☰</button>
+      <div class="title"><small id="modeEyebrow">ASSISTENTE</small><h1 id="chatTitle">Nova conversa</h1></div>
+      <div class="top-actions">
+        <button class="icon" id="exportChat" title="Exportar conversa">⤓</button>
+        <button class="icon" id="voiceMode" title="Modo conversa por voz">◉</button>
+      </div>
+    </header>
+
+    <section class="thread" id="thread">
+      <div class="hero" id="hero">
+        <div class="reactor"><i></i><i></i><i></i><b>J</b></div>
+        <h2>Pronto quando você estiver, <em id="userName">senhor</em>.</h2>
+        <p>Pesquiso a web, analiso arquivos e fotos, programo, crio jogos, apps e imagens, executo cálculos e converso por voz.</p>
+        <div class="cards" id="cards"></div>
+      </div>
+    </section>
+
+    <footer class="composer-wrap">
+      <div class="attach-row" id="attachRow"></div>
+      <div class="composer">
+        <button class="icon" id="attachBtn" title="Anexar arquivos, fotos, PDF">＋</button>
+        <input type="file" id="fileInput" multiple hidden accept="image/*,application/pdf,text/*,.md,.csv,.json,.js,.ts,.py,.html,.css,audio/*,video/mp4">
+        <textarea id="input" rows="1" placeholder="Pergunte qualquer coisa ao Jarvis…"></textarea>
+        <button class="icon" id="micBtn" title="Ditar">🎙</button>
+        <button class="send" id="sendBtn" title="Enviar">➤</button>
+      </div>
+      <div class="toggles">
+        <label class="chip"><input type="checkbox" id="webToggle"> 🌐 Web</label>
+        <label class="chip"><input type="checkbox" id="deepToggle"> 🧠 Raciocínio profundo</label>
+        <label class="chip"><input type="checkbox" id="speakToggle"> 🔊 Falar respostas</label>
+        <span class="hint" id="modelHint"></span>
+      </div>
+    </footer>
+  </main>
+
+  <aside class="preview" id="preview">
+    <header><b id="previewTitle">Prévia ao vivo</b>
+      <div><button class="icon" id="previewFull" title="Abrir em nova aba">↗</button><button class="icon" id="previewZip" title="Baixar ZIP">⤓</button><button class="icon" id="previewClose">✕</button></div>
+    </header>
+    <div class="tabs" id="previewTabs"></div>
+    <iframe id="previewFrame" sandbox="allow-scripts allow-modals allow-forms allow-pointer-lock allow-popups" title="Prévia"></iframe>
+    <pre id="previewCode" hidden></pre>
+  </aside>
+</div>
+
+<dialog id="settings">
+  <form method="dialog">
+    <h3>Configurações</h3>
+    <label>Seu nome<input id="setName" placeholder="Como o Jarvis deve te chamar"></label>
+    <label>Senha de acesso (se configurada no servidor)<input id="setKey" type="password" autocomplete="off"></label>
+    <label>Voz do Jarvis
+      <select id="setVoice"><option>Charon</option><option>Puck</option><option>Fenrir</option><option>Orus</option><option>Kore</option><option>Aoede</option><option>Zephyr</option><option value="browser">Voz do navegador</option></select>
+    </label>
+    <label class="row"><input type="checkbox" id="setSave" checked> Salvar conversas neste aparelho</label>
+    <div class="dlg-actions"><button value="clear" id="clearAll" class="danger">Apagar tudo</button><button value="ok">Salvar</button></div>
+  </form>
+</dialog>
+
+<dialog id="memory">
+  <form method="dialog">
+    <h3>🧠 Memória do Jarvis</h3>
+    <p class="muted">Fatos que o Jarvis lembra em todas as conversas. Diga “lembre que…” no chat para adicionar automaticamente.</p>
+    <textarea id="memText" rows="10" placeholder="Ex.: Meu nome é Thallys. Trabalho com… Prefiro respostas curtas."></textarea>
+    <div class="dlg-actions"><button value="ok">Salvar</button></div>
+  </form>
+</dialog>
+
+<div class="voice-overlay" id="voiceOverlay" hidden>
+  <div class="reactor big"><i></i><i></i><i></i><b>J</b></div>
+  <p id="voiceStatus">Ouvindo…</p>
+  <button id="voiceStop">Encerrar</button>
+</div>
+<div class="toast" id="toast"></div>
+</body>
+</html>
